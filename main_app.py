@@ -2,7 +2,7 @@ import streamlit as st
 import pandas as pd
 import numpy as np
 import plotly.express as px
-import matplotlib.pyplot as plt
+
 st.markdown('''
     ### Welcome to :rainbow[SAEDA]: *SEMI AUTOMATED EXPLORATORY DATA ANALYSIS*''')
 uploaded_file = st.file_uploader("Please upload a CSV file :seedling:",type=['csv'],key='csvfile')
