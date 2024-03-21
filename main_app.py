@@ -2,6 +2,8 @@ import streamlit as st
 import pandas as pd
 import numpy as np
 import plotly.express as px
+import seaborn as sns
+import plotly.graph_objects as go
 
 st.markdown('''
     ### Welcome to :rainbow[SAEDA]: *SEMI AUTOMATED EXPLORATORY DATA ANALYSIS*''')
@@ -103,10 +105,36 @@ if uploaded_file is not None:
         if(missing_value_prop>25):
             container.write('##### Missing values: :red[{var}]'.format(var=missing_value_num))
             container.write('##### Missing values : :red[{var}%]'.format(var=missing_value_prop))
-        
-        
+        hist_variable=px.histogram(dataframe, x=variable,color_discrete_sequence=['yellow'])
+        container.plotly_chart(hist_variable,theme='streamlit',use_container_width=True)
+    container_bivariate=st.container(border=True)
+    container_bivariate.header(":blue[BI-VARIATE ANALYSIS]")
+    columns_list=dataframe.columns.tolist()
+    columns_list.remove(option)
+    if len(columns_list)>10:
+        select_box_variable=container_bivariate.selectbox("Select the Independent variable to analyze: ", columns_list[:])
+        dependent_variable_dtype=dataframe[option].dtype
+        independen_variable_dtype=dataframe[select_box_variable].dtype
+        if ((independen_variable_dtype=='int64') or (independen_variable_dtype=='float64')) and \
+           ((dependent_variable_dtype=='object')or(dependent_variable_dtype=='bool')):
+            fig = px.box(dataframe, x=dataframe[option], y=dataframe[select_box_variable], color=dataframe[option],color_discrete_sequence=['yellow'])
+            container_bivariate.plotly_chart(fig,theme='streamlit',use_container_width=True)
+        if ((independen_variable_dtype=='int64') or (independen_variable_dtype=='float64'))and \
+           ((dependent_variable_dtype=='int64') or (dependent_variable_dtype=='float64')):
+            fig=px.scatter(dataframe,x=dataframe[select_box_variable],y=dataframe[option],color_discrete_sequence=['yellow'])
+            container_bivariate.plotly_chart(fig,theme='streamlit',use_container_width=True)
+        if (independen_variable_dtype=='object')and \
+           (dependent_variable_dtype=='object'):
+            cont_table = pd.crosstab(dataframe[option], dataframe[select_box_variable])
+            container_bivariate.write(cont_table)
+            #heatmap=sns.heatmap(dataframe.groupby([option, select_box_variable]).size().unstack(fill_value=0), cmap='YlGnBu')
+            heatmap_df=dataframe.groupby([option, select_box_variable]).size().unstack(fill_value=0)
+            fig1=px.imshow(heatmap_df)
+           
+            container_bivariate.plotly_chart(fig1, theme="streamlit",use_container_width=True)
 
-    
+            
+
 
     
 
