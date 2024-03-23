@@ -35,7 +35,7 @@ if uploaded_file is not None:
     '#### :rainbow[Please select a variable to generate variable statistics.]', dataframe.columns, placeholder='Please select a variable')
     
     container=st.container(border=True)
-    if(dataframe[variable].dtype !='object'):
+    if(dataframe[variable].dtype !='object' and dataframe[variable].dtype!='bool'):
         container.write('##### Variable name: :green[{var}]'.format(var=variable))
         container.write('##### Variable Datatype: :green[{var}]'.format(var=dataframe[variable].dtype))
         container.write('##### Number of distinct values: :green[{var}]'.format(var=len(dataframe[variable].unique())))
@@ -81,7 +81,7 @@ if uploaded_file is not None:
             container.plotly_chart(fig,theme="streamlit", use_container_width=True)
             fig = px.box(dataframe, y=variable,color_discrete_sequence=['yellow'])
             container.plotly_chart(fig,theme='streamlit',use_container_width=True)
-    else:
+    elif (dataframe[variable].dtype =='object'):
         container=st.container(border=True)
         container.warning('The threshold set for cardinality is 2% of total dataset size. ', icon="⚠️")
         cardinality_threshold=(len(dataframe)*2)/100
@@ -107,6 +107,26 @@ if uploaded_file is not None:
             container.write('##### Missing values : :red[{var}%]'.format(var=missing_value_prop))
         hist_variable=px.histogram(dataframe, x=variable,color_discrete_sequence=['yellow'])
         container.plotly_chart(hist_variable,theme='streamlit',use_container_width=True)
+    else:
+        container=st.container(border=True)
+        container.write('##### Variable Datatype: :green[{datatype}]'.format(datatype=dataframe[variable].dtype))
+        container.write('##### Number of True values: :green[{var}]'.format(var=dataframe[dataframe[variable]==True][variable].count()))
+        container.write('##### Number of False values: :green[{var}]'.format(var=dataframe[dataframe[variable]==False][variable].count()))
+        missing_value_num=(sum(dataframe[[variable]].isna().sum()[0:])+sum(dataframe[[variable]].eq('').sum(axis=1)))
+        missing_value_prop=((sum(dataframe[[variable]].isna().sum()[0:])+sum(dataframe[[variable]].eq('').sum(axis=1)))/len(dataframe[variable]))*100
+        if (missing_value_prop<=25):
+            container.write('##### Missing values: :green[{var}]'.format(var=missing_value_num))
+            container.write('##### Missing values prop: :green[{var}%]'.format(var=missing_value_prop))
+        if(missing_value_prop>25):
+            container.write('##### Missing values: :red[{var}]'.format(var=missing_value_num))
+            container.write('##### Missing values : :red[{var}%]'.format(var=missing_value_prop))
+        
+
+    
+    
+    
+    
+    
     container_bivariate=st.container(border=True)
     container_bivariate.header(":blue[BI-VARIATE ANALYSIS]")
     columns_list=dataframe.columns.tolist()
@@ -135,7 +155,6 @@ if uploaded_file is not None:
            (dependent_variable_dtype=='object'):
             cont_table = pd.crosstab(dataframe[option], dataframe[select_box_variable])
             container_bivariate.write(cont_table)
-            #heatmap=sns.heatmap(dataframe.groupby([option, select_box_variable]).size().unstack(fill_value=0), cmap='YlGnBu')
             heatmap_df=dataframe.groupby([option, select_box_variable]).size().unstack(fill_value=0)
             fig1=px.imshow(heatmap_df)
             container_bivariate.plotly_chart(fig1, theme="streamlit",use_container_width=True)
@@ -148,7 +167,15 @@ if uploaded_file is not None:
             fig = px.bar(dataframe, x=dataframe.groupby(select_box_variable)[select_box_variable].count().index.tolist(), y=dataframe.groupby(select_box_variable)[option].count(),color_discrete_sequence=['yellow'])
             fig.update_layout(xaxis_title=select_box_variable,yaxis_title=option, title='COUNT PLOT BETWEEN {x} and {y}'.format(x=select_box_variable,y=option))
             container_bivariate.plotly_chart(fig,theme='streamlit',use_container_width=True)
-            
+    
+    st.write('## :blue[CORRELATION MATRIX]')
+    container_correlation=st.container()
+    fig1=px.imshow(dataframe.corr(method='pearson',numeric_only=True))
+    container_correlation.plotly_chart(fig1, theme="streamlit",width=800)
+    container_correlation.warning('Kind Note: If you have got more columns or your feel the correlation matrix is looking very cluttered and clumsy. To get good visual experience and understanding, please zoom-in the map. Thank you.', icon="⚠️")
+    
+    
+       
 
             
             
