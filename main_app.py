@@ -117,11 +117,19 @@ if uploaded_file is not None:
         independen_variable_dtype=dataframe[select_box_variable].dtype
         if ((independen_variable_dtype=='int64') or (independen_variable_dtype=='float64')) and \
            ((dependent_variable_dtype=='object')or(dependent_variable_dtype=='bool')):
-            fig = px.box(dataframe, x=dataframe[option], y=dataframe[select_box_variable], color=dataframe[option],color_discrete_sequence=['yellow'])
+            fig = px.box(dataframe, x=dataframe[option], y=dataframe[select_box_variable], color=dataframe[option],color_discrete_sequence=['yellow'],title='BOX PLOT BETWEEN {x} and {y}'.format(x=option,y=select_box_variable))
             container_bivariate.plotly_chart(fig,theme='streamlit',use_container_width=True)
+            fig = px.bar(dataframe, x=option, y=select_box_variable,color_discrete_sequence=['yellow'],title='BAR CHART BETWEEN {x} and {y}'.format(x=option,y=select_box_variable))
+            container_bivariate.plotly_chart(fig,theme='streamlit',use_container_width=True)
+            fig = px.bar(dataframe, x=dataframe.groupby(option)[option].count().index.tolist(), y=dataframe.groupby(option)[select_box_variable].count(),color_discrete_sequence=['yellow'])
+            fig.update_layout(xaxis_title=select_box_variable,yaxis_title=option, title='COUNT PLOT BETWEEN {x} and {y}'.format(x=option,y=select_box_variable))
+            container_bivariate.plotly_chart(fig,theme='streamlit',use_container_width=True)
+
         if ((independen_variable_dtype=='int64') or (independen_variable_dtype=='float64'))and \
            ((dependent_variable_dtype=='int64') or (dependent_variable_dtype=='float64')):
-            fig=px.scatter(dataframe,x=dataframe[select_box_variable],y=dataframe[option],color_discrete_sequence=['yellow'])
+            fig=px.scatter(dataframe,x=dataframe[select_box_variable],y=dataframe[option],color_discrete_sequence=['yellow'],title='SCATTER PLOT BETWEEN {x} and {y}'.format(x=select_box_variable,y=option))
+            container_bivariate.plotly_chart(fig,theme='streamlit',use_container_width=True)
+            fig = px.line(dataframe, x=select_box_variable, y=option,color_discrete_sequence=['yellow'] ,title='LINE PLOT BETWEEN {x} and {y}'.format(x=select_box_variable,y=option))
             container_bivariate.plotly_chart(fig,theme='streamlit',use_container_width=True)
         if (independen_variable_dtype=='object')and \
            (dependent_variable_dtype=='object'):
@@ -130,8 +138,21 @@ if uploaded_file is not None:
             #heatmap=sns.heatmap(dataframe.groupby([option, select_box_variable]).size().unstack(fill_value=0), cmap='YlGnBu')
             heatmap_df=dataframe.groupby([option, select_box_variable]).size().unstack(fill_value=0)
             fig1=px.imshow(heatmap_df)
-           
             container_bivariate.plotly_chart(fig1, theme="streamlit",use_container_width=True)
+        
+        if ((independen_variable_dtype=='object') and (dependent_variable_dtype=='int64') or (dependent_variable_dtype=='float64') or (dependent_variable_dtype=='bool')):
+            fig = px.box(dataframe, x=dataframe[select_box_variable], y=dataframe[option], color=dataframe[option],color_discrete_sequence=['yellow'],title='BOX PLOT BETWEEN {x} and {y}'.format(x=select_box_variable,y=option))
+            container_bivariate.plotly_chart(fig,theme='streamlit',use_container_width=True)
+            fig = px.bar(dataframe, x=select_box_variable, y=option,color_discrete_sequence=['yellow'],title='BAR CHART BETWEEN {x} and {y}'.format(x=select_box_variable,y=option))
+            container_bivariate.plotly_chart(fig,theme='streamlit',use_container_width=True)
+            fig = px.bar(dataframe, x=dataframe.groupby(select_box_variable)[select_box_variable].count().index.tolist(), y=dataframe.groupby(select_box_variable)[option].count(),color_discrete_sequence=['yellow'])
+            fig.update_layout(xaxis_title=select_box_variable,yaxis_title=option, title='COUNT PLOT BETWEEN {x} and {y}'.format(x=select_box_variable,y=option))
+            container_bivariate.plotly_chart(fig,theme='streamlit',use_container_width=True)
+            
+
+            
+            
+
 
             
 
