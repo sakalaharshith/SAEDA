@@ -170,9 +170,14 @@ if uploaded_file is not None:
     
     st.write('## :blue[CORRELATION MATRIX]')
     container_correlation=st.container()
-    fig1=px.imshow(dataframe.corr(method='pearson',numeric_only=True))
-    container_correlation.plotly_chart(fig1, theme="streamlit",width=800)
-    container_correlation.warning('Kind Note: If you have got more columns or your feel the correlation matrix is looking very cluttered and clumsy. To get good visual experience and understanding, please zoom-in the map. Thank you.', icon="⚠️")
+    select_metrics_variable=container_correlation.selectbox("Select the correlation method: ",['pearson','spearman','kendall']) 
+    fig1=px.imshow(dataframe.corr(method=select_metrics_variable,numeric_only=True),text_auto=True)
+    fig1.update_layout(
+    width=600,
+    height=600
+)
+    container_correlation.plotly_chart(fig1, theme="streamlit",use_container_width=True)
+    container_correlation.warning('Kind Note: If you have got more columns or your feel the correlation matrix is looking very cluttered and clumsy, to get good visual experience and understanding, please zoom-in the map. Thank you.', icon="⚠️")
     
     
        
