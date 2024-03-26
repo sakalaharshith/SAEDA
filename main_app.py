@@ -4,6 +4,7 @@ import numpy as np
 import plotly.express as px
 import seaborn as sns
 import plotly.graph_objects as go
+from scipy.stats import chi2_contingency
 
 st.markdown('''
     ### Welcome to :rainbow[SAEDA]: *SEMI AUTOMATED EXPLORATORY DATA ANALYSIS*''')
@@ -178,6 +179,24 @@ if uploaded_file is not None:
 )
     container_correlation.plotly_chart(fig1, theme="streamlit",use_container_width=True)
     container_correlation.warning('Kind Note: If you have got more columns or your feel the correlation matrix is looking very cluttered and clumsy, to get good visual experience and understanding, please zoom-in the map. Thank you.', icon="⚠️")
+    st.write('## :blue[STATISTICAL TESTING OR ANALYSIS]')
+    container_statistical_testing=st.container(border=True)
+    select_statistical_testing=container_statistical_testing.selectbox("Select type of statistical analysis",['categorical-categorical','categorical-numerical'])
+    if select_statistical_testing=='categorical-categorical':
+        select_categorical_variable_1=container_statistical_testing.selectbox("Select the first categorical variable analysis",dataframe.select_dtypes(include=['object']).columns)
+        select_categorical_variable_2=container_statistical_testing.selectbox('Select the second categorical variable for analysis',dataframe.select_dtypes(include=['object']).columns)
+        if select_categorical_variable_2!=select_categorical_variable_1:
+            contingency_table=pd.crosstab(dataframe[select_categorical_variable_1],dataframe[select_categorical_variable_2])
+            container_statistical_testing.write(contingency_table)
+            res = chi2_contingency(contingency_table)
+            container_statistical_testing.write('##### Chi-Square Statistic: :green[{var}]'.format(var=res.statistic))
+            container_statistical_testing.write('##### Chi-Square Statistic p-value: :green[{var}]'.format(var=res.pvalue))
+            if dataframe[select_categorical_variable_1]>10 | dataframe[select_categorical_variable_2]>10:
+                container_statistical_testing.warning("The number of categories is too large.")
+
+        else:
+            container_statistical_testing.warning('It seems that you have selected same variable names on both the fields. So, please select different variables in the above selection boxes.',icon="⚠️")
+    
     
     
        
