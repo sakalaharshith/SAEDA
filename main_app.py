@@ -191,12 +191,14 @@ if uploaded_file is not None:
             res = chi2_contingency(contingency_table)
             container_statistical_testing.write('##### Chi-Square Statistic: :green[{var}]'.format(var=res.statistic))
             container_statistical_testing.write('##### Chi-Square Statistic p-value: :green[{var}]'.format(var=res.pvalue))
-            if dataframe[select_categorical_variable_1]>10 | dataframe[select_categorical_variable_2]>10:
-                container_statistical_testing.warning("The number of categories is too large.")
+            
+            if len(dataframe[select_categorical_variable_1].unique())>10 | len(dataframe[select_categorical_variable_2].unique())>10:
+                container_statistical_testing.warning("The number of categories is too large. please try to reduce it to less than 10 for better and accurate analysis.")
 
         else:
             container_statistical_testing.warning('It seems that you have selected same variable names on both the fields. So, please select different variables in the above selection boxes.',icon="⚠️")
-    
+    if select_statistical_testing=='categorical-numerical':
+        
     
     
        
